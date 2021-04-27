@@ -11,12 +11,11 @@ boxjs订阅地址:https://gitee.com/passerby-b/javascript/raw/master/JD/passerby
 
 const $ = new API("jddj_fruit");
 let isNotify = true;//是否通知,仅限nodejs,手机用boxjs设置
-let barkKey = '';//BarkKey填写此处,仅限nodejs,手机用boxjs填写
 let thiscookie = '', deviceid = '', nickname = '';
 let lat = '30.' + Math.round(Math.random() * (99999 - 10000) + 10000);
 let lng = '114.' + Math.round(Math.random() * (99999 - 10000) + 10000);
 let cityid = Math.round(Math.random() * (1500 - 1000) + 1000);
-let cookies = [], treeInfoTimes = false;
+let cookies = [], treeInfoTimes = false; notify = '';
 !(async () => {
     if (cookies.length == 0) {
         if ($.env.isNode) { delete require.cache['./jddj_cookie.js']; cookies = require('./jddj_cookie.js') }
@@ -37,7 +36,9 @@ let cookies = [], treeInfoTimes = false;
     }
     if (!$.env.isNode) {
         isNotify = $.read('#jddj_isNotify');
-        barkKey = $.read('#jddj_barkKey');
+    }
+    else {
+        notify = require('./sendNotify');
     }
     for (let i = 0; i < cookies.length; i++) {
         console.log(`\r\n★★★★★开始执行第${i + 1}个账号,共${cookies.length}个账号★★★★★`);
@@ -62,7 +63,9 @@ let cookies = [], treeInfoTimes = false;
         let tslist = await taskList();
         if (tslist.code == 1) {
             $.notify('第' + (i + 1) + '个账号cookie过期', '请访问https://daojia.jd.com/html/index.html抓取cookie', { url: 'https://daojia.jd.com/html/index.html' });
-            sendMSg('第' + (i + 1) + '个账号cookie过期', '请访问https://daojia.jd.com/html/index.html抓取cookie');
+            if ($.env.isNode && `${isNotify}` == 'true') {
+                await notify.sendNotify('第' + (i + 1) + '个账号cookie过期', '请访问https://daojia.jd.com/html/index.html抓取cookie');
+            }
             continue;
         }
 
@@ -83,11 +86,13 @@ let cookies = [], treeInfoTimes = false;
 
         await treeInfo();
         await $.wait(1000);
-
     }
 
-})().catch((e) => {
+})().catch(async (e) => {
     console.log('', `❌失败! 原因: ${e}!`, '');
+    if ($.env.isNode && `${isNotify}` == 'true') {
+        notify.sendNotify('京东到家果园', `❌失败! 原因: ${e}!`);
+    }
 }).finally(() => {
     $.done();
 })
@@ -335,9 +340,18 @@ async function treeInfo() {
                 let data = JSON.parse(response.body);
                 if (data.code == 0) {
                     console.log('\n【果树信息】:' + data.result.activityInfoResponse.fruitName + ',还需浇水' + data.result.activityInfoResponse.curStageLeftProcess + '次' + data.result.activityInfoResponse.stageName + ',还剩' + data.result.userResponse.waterBalance + '滴水');
+
                     if (data.result.activityInfoResponse.curStageLeftProcess == 0 && treeInfoTimes) {
                         $.notify(nickname, '京东到家果园' + data.result.activityInfoResponse.fruitName + '已成熟,快去收取!', '');
-                        sendMSg(nickname, '京东到家果园' + data.result.activityInfoResponse.fruitName + '已成熟,快去收取!');
+                        if ($.env.isNode && `${isNotify}` == 'true') {
+                            await notify.sendNotify(nickname, '京东到家果园' + data.result.activityInfoResponse.fruitName + '已成熟,快去收取!');
+                        }
+                    }
+                    if (data.result.activityInfoResponse.curStageLeftProcess > 0 && treeInfoTimes) {
+                        $.notify(nickname, '\n【果树信息】:' + data.result.activityInfoResponse.fruitName + ',还需浇水' + data.result.activityInfoResponse.curStageLeftProcess + '次' + data.result.activityInfoResponse.stageName + ',还剩' + data.result.userResponse.waterBalance + '滴水', '');
+                        if ($.env.isNode && `${isNotify}` == 'true') {
+                            await notify.sendNotify(nickname, '\n【果树信息】:' + data.result.activityInfoResponse.fruitName + ',还需浇水' + data.result.activityInfoResponse.curStageLeftProcess + '次' + data.result.activityInfoResponse.stageName + ',还剩' + data.result.userResponse.waterBalance + '滴水');
+                        }
                     }
                 }
                 resolve();
@@ -351,16 +365,6 @@ async function treeInfo() {
 
     })
 }
-
-//通知
-async function sendMSg(title, content) {
-    if (!!barkKey && `${isNotify}` == 'true') {
-        $.http.get({ url: `https://api.day.app/${barkKey}/${encodeURIComponent(title)}/${encodeURIComponent(content)}` }).then(response => {
-            console.log(response.body);
-        })
-    }
-}
-
 
 function urlTask(url, body) {
     let option = {

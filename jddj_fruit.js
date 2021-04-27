@@ -39,8 +39,6 @@ let cookies = [], treeInfoTimes = false;
     if (!$.env.isNode) {
         isNotify = $.read('#jddj_isNotify');
         barkKey = $.read('#jddj_barkKey');
-        console.log(isNotify);
-        console.log(11111);
     }
     for (let i = 0; i < cookies.length; i++) {
         console.log(`\r\n★★★★★开始执行第${i + 1}个账号,共${cookies.length}个账号★★★★★`);
@@ -69,20 +67,20 @@ let cookies = [], treeInfoTimes = false;
             continue;
         }
 
-        // await sign();
-        // await $.wait(1000);
+        await sign();
+        await $.wait(1000);
 
-        // await runTask(tslist);
-        // await $.wait(1000);
+        await runTask(tslist);
+        await $.wait(1000);
 
-        // await zhuLi();
-        // await $.wait(1000);
+        await zhuLi();
+        await $.wait(1000);
 
-        // await water();
-        // await $.wait(1000);
+        await water();
+        await $.wait(1000);
 
-        // await runTask2(tslist);
-        // await $.wait(1000);
+        await runTask2(tslist);
+        await $.wait(1000);
 
         await treeInfo();
         await $.wait(1000);
@@ -338,7 +336,7 @@ async function treeInfo() {
                 let data = JSON.parse(response.body);
                 if (data.code == 0) {
                     console.log('\n【果树信息】:' + data.result.activityInfoResponse.fruitName + ',还需浇水' + data.result.activityInfoResponse.curStageLeftProcess + '次' + data.result.activityInfoResponse.stageName + ',还剩' + data.result.userResponse.waterBalance + '滴水');
-                    if (data.result.activityInfoResponse.curStageLeftProcess != 0 && treeInfoTimes) {
+                    if (data.result.activityInfoResponse.curStageLeftProcess == 0 && treeInfoTimes) {
                         $.notify(nickname, '京东到家果园' + data.result.activityInfoResponse.fruitName + '已成熟,快去收取!', '');
                         sendMSg(nickname, '京东到家果园' + data.result.activityInfoResponse.fruitName + '已成熟,快去收取!');
                     }

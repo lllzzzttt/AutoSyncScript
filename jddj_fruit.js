@@ -49,9 +49,7 @@ let cookies = [];
         var jsonlist = {};
         var params = thiscookie.split(';');
         params.forEach(item => {
-            if (item.indexOf('=') > -1) {
-                jsonlist[item.split('=')[0].trim()] = item.split('=')[1].trim();
-            }
+            if (item.indexOf('=') > -1) jsonlist[item.split('=')[0].trim()] = item.split('=')[1].trim();
         });
         deviceid = jsonlist.deviceid_pdj_jd;
 
@@ -64,7 +62,7 @@ let cookies = [];
         let tslist = await taskList();
         if (tslist.code == 1) {
             $.notify('第' + (i + 1) + '个账号cookie过期', '请访问https://daojia.jd.com/html/index.html抓取cookie', { url: 'https://daojia.jd.com/html/index.html' });
-            if (isNotify) sendMSg('第' + (i + 1) + '个账号cookie过期', '请访问https://daojia.jd.com/html/index.html抓取cookie');
+            if (isNotify || isNotify == 'true') sendMSg('第' + (i + 1) + '个账号cookie过期', '请访问https://daojia.jd.com/html/index.html抓取cookie');
             continue;
         }
 
@@ -339,7 +337,7 @@ async function treeInfo() {
                     console.log('\n【果树信息】:' + data.result.activityInfoResponse.fruitName + ',还需浇水' + data.result.activityInfoResponse.curStageLeftProcess + '次' + data.result.activityInfoResponse.stageName + ',还剩' + data.result.userResponse.waterBalance + '滴水');
                     if (data.result.activityInfoResponse.curStageLeftProcess != 0) {
                         $.notify(nickname, '京东到家果园' + data.result.activityInfoResponse.fruitName + '已成熟,快去收取!', '');
-                        if (isNotify) sendMSg(nickname, '京东到家果园' + data.result.activityInfoResponse.fruitName + '已成熟,快去收取!');
+                        if (isNotify || isNotify == 'true') sendMSg(nickname, '京东到家果园' + data.result.activityInfoResponse.fruitName + '已成熟,快去收取!');
                     }
                 }
                 resolve();

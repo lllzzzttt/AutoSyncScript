@@ -17,7 +17,7 @@ let thiscookie = '', deviceid = '', nickname = '';
 let lat = '30.' + Math.round(Math.random() * (99999 - 10000) + 10000);
 let lng = '114.' + Math.round(Math.random() * (99999 - 10000) + 10000);
 let cityid = Math.round(Math.random() * (1500 - 1000) + 1000);
-let cookies = [];
+let cookies = [], treeInfoTimes = false;
 !(async () => {
     if (cookies.length == 0) {
         if ($.env.isNode) { delete require.cache['./jddj_cookie.js']; cookies = require('./jddj_cookie.js') }
@@ -40,7 +40,7 @@ let cookies = [];
         isNotify = $.read('#jddj_isNotify');
         barkKey = $.read('#jddj_barkKey');
         console.log(isNotify);
-        console.log(111);
+        console.log(11111);
     }
     for (let i = 0; i < cookies.length; i++) {
         console.log(`\r\n★★★★★开始执行第${i + 1}个账号,共${cookies.length}个账号★★★★★`);
@@ -58,30 +58,31 @@ let cookies = [];
         await userinfo();
         await $.wait(1000);
 
+        treeInfoTimes = false;
         await treeInfo();
         await $.wait(1000);
 
         let tslist = await taskList();
         if (tslist.code == 1) {
             $.notify('第' + (i + 1) + '个账号cookie过期', '请访问https://daojia.jd.com/html/index.html抓取cookie', { url: 'https://daojia.jd.com/html/index.html' });
-            if (isNotify || isNotify == 'true') sendMSg('第' + (i + 1) + '个账号cookie过期', '请访问https://daojia.jd.com/html/index.html抓取cookie');
+            sendMSg('第' + (i + 1) + '个账号cookie过期', '请访问https://daojia.jd.com/html/index.html抓取cookie');
             continue;
         }
 
-        await sign();
-        await $.wait(1000);
+        // await sign();
+        // await $.wait(1000);
 
-        await runTask(tslist);
-        await $.wait(1000);
+        // await runTask(tslist);
+        // await $.wait(1000);
 
-        await zhuLi();
-        await $.wait(1000);
+        // await zhuLi();
+        // await $.wait(1000);
 
-        await water();
-        await $.wait(1000);
+        // await water();
+        // await $.wait(1000);
 
-        await runTask2(tslist);
-        await $.wait(1000);
+        // await runTask2(tslist);
+        // await $.wait(1000);
 
         await treeInfo();
         await $.wait(1000);
@@ -337,9 +338,9 @@ async function treeInfo() {
                 let data = JSON.parse(response.body);
                 if (data.code == 0) {
                     console.log('\n【果树信息】:' + data.result.activityInfoResponse.fruitName + ',还需浇水' + data.result.activityInfoResponse.curStageLeftProcess + '次' + data.result.activityInfoResponse.stageName + ',还剩' + data.result.userResponse.waterBalance + '滴水');
-                    if (data.result.activityInfoResponse.curStageLeftProcess != 0) {
+                    if (data.result.activityInfoResponse.curStageLeftProcess != 0 && treeInfoTimes) {
                         $.notify(nickname, '京东到家果园' + data.result.activityInfoResponse.fruitName + '已成熟,快去收取!', '');
-                        if (isNotify || isNotify == 'true') sendMSg(nickname, '京东到家果园' + data.result.activityInfoResponse.fruitName + '已成熟,快去收取!');
+                        sendMSg(nickname, '京东到家果园' + data.result.activityInfoResponse.fruitName + '已成熟,快去收取!');
                     }
                 }
                 resolve();
@@ -347,6 +348,8 @@ async function treeInfo() {
         } catch (error) {
             console.log('\n【果树信息】:' + error);
             resolve();
+        } finally {
+            treeInfoTimes = true;
         }
 
     })
@@ -354,7 +357,7 @@ async function treeInfo() {
 
 //通知
 async function sendMSg(title, content) {
-    if (!!barkKey) {
+    if (!!barkKey && `${isNotify}` == 'true') {
         $.http.get({ url: `https://api.day.app/${barkKey}/${encodeURIComponent(title)}/${encodeURIComponent(content)}` }).then(response => {
             console.log(response.body);
         })

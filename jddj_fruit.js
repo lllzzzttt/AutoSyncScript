@@ -40,6 +40,7 @@ let cookies = [];
         isNotify = $.read('#jddj_isNotify');
         barkKey = $.read('#jddj_barkKey');
         console.log(isNotify);
+        console.log(111);
     }
     for (let i = 0; i < cookies.length; i++) {
         console.log(`\r\n★★★★★开始执行第${i + 1}个账号,共${cookies.length}个账号★★★★★`);

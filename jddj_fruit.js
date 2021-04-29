@@ -210,7 +210,7 @@ async function zhuLi() {
                 resolve();
             })
         } catch (error) {
-            console.log('\n【助力】:' + error);
+            //console.log('\n【助力】:' + error);
             resolve();
         }
     })

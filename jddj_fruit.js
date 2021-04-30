@@ -8,7 +8,6 @@ boxjs订阅地址:https://gitee.com/passerby-b/javascript/raw/master/JD/passerby
 
 [task_local]
 10 0,8,11,17 * * * https://raw.githubusercontent.com/passerby-b/JDDJ/main/jddj_fruit.js
-
 */
 
 let isNotify = true;//是否通知,仅限nodejs,手机用boxjs设置
